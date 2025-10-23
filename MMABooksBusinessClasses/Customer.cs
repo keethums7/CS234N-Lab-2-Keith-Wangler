@@ -138,7 +138,9 @@ namespace MMABooksBusinessClasses
 
         public override string ToString()
         {
-            return base.ToString();
+            return $"Customer ID: {CustomerID}\nName: {Name}" +
+                $"\nAddress: {Address}\nCity: {City}" +
+                $"\nState: {State}\nZip Code: {ZipCode}";
         }
     }
 }

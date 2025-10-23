@@ -61,6 +61,63 @@ namespace MMABooksTests
         }
 
         [Test]
+        public void TestProductCodeSetter()
+        {
+            string testCode = "testCode";
+            product.ProductCode = testCode;
+
+            Assert.AreEqual(testCode, product.ProductCode);
+        }
+        [Test]
+        public void TestProductDescriptionSetter()
+        {
+            string testDescription = "testDescription";
+            product.Description = testDescription;
+
+            Assert.AreEqual(testDescription, product.Description);
+            
+        }
+        [Test]
+        public void TestProductUnitPriceSetter()
+        {
+            decimal testPrice = 10.01m;
+            product.UnitPrice = testPrice;
+
+            Assert.AreEqual(testPrice, product.UnitPrice);
+            
+        }
+        [Test]
+        public void TestProductOnHandQuantitySetter()
+        {
+            int testQty = 1001;
+            product.OnHandQuantity = testQty;
+
+            Assert.AreEqual(testQty, product.OnHandQuantity);
+            
+        }
+
+        [Test]
+        public void TestProductCodeGetter()
+        {
+            Assert.AreEqual("testGizmo1", product1.ProductCode);
+        }
+        [Test]
+        public void TestProductDescriptionGetter()
+        {
+            Assert.AreEqual("Test Gizmo 1", product1.Description);
+        }
+        [Test]
+        public void TestProductUnitPriceGetter()
+        {
+            Assert.AreEqual(25.00m, product1.UnitPrice);
+        }
+        [Test]
+        public void TestProductOnHandQuantityGetter()
+        {
+            Assert.AreEqual(25, product1.OnHandQuantity);
+        }
+
+        [Test]
         public void TestProductToString()
         {
             // needed to see what these even evaluate to before devising tests

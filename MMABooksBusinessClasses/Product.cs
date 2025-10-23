@@ -9,7 +9,7 @@ namespace MMABooksBusinessClasses
     {
         public Product() { }
 
-        public Product(string productCode, string description, decimal unitPrice, int onhandQuantity)
+        public Product(string productCode, string description, decimal unitPrice, int onHandQuantity)
         {
             ProductCode = productCode;
             Description = description;
@@ -92,6 +92,11 @@ namespace MMABooksBusinessClasses
                     onHandQuantity = value;
                 }
             }
+        }
+
+        public override string ToString()
+        {
+            return $"Code: {ProductCode}\nDescription: {Description}\nUnitPrice: {UnitPrice}\nOnHandQuantity: {OnHandQuantity}";
         }
     }
 }

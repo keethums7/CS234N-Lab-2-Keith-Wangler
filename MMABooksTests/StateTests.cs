@@ -7,6 +7,20 @@ namespace MMABooksTests
     [TestFixture]
     public class StateTests
     {
+        // you may have noticed that I need a state object in each test
+        // a better solution is to create an instance variable for the state
+        // and create a method, annotated with [SetUp], to instantiate the object
+        // all tests could then use state (rather than state1) 
+        private State state;
+
+        // this method gets called BEFORE EVERY TEST to recreate the state object
+        // so that every test gets a "fresh" state and the results of one test
+        // don't impact the results of the next
+        [SetUp]
+        public void SetUp()
+        {
+            state = new State("NY", "New York");
+        }
 
         [Test]
         public void Test1()
@@ -37,12 +51,15 @@ namespace MMABooksTests
             State state1 = new State("NY", "New York");
             string newCode = "OR";
             string newName = "Oregon";
+
             // call the setters
             state1.StateCode = newCode;
             state1.StateName = newName;
+
             // assert that the property now returns the new values
             Assert.AreEqual(newCode, state1.StateCode);
             Assert.AreEqual(newName, state1.StateName);
+
             // the previous part of the test isn't sufficient because the setters might ALWAYS set the properties to oregon
             // make sure that's not the case by providing a different set of values
             newCode = "CA";
@@ -69,20 +86,6 @@ namespace MMABooksTests
         }
 
 
-        // you may have noticed that I need a state object in each test
-        // a better solution is to create an instance variable for the state
-        // and create a method, annotated with [SetUp], to instantiate the object
-        // all tests could then use state (rather than state1) 
-        private State state;
-
-        // this method gets called BEFORE EVERY TEST to recreate the state object
-        // so that every test gets a "fresh" state and the results of one test
-        // don't impact the results of the next
-        [SetUp]
-        public void SetUp()
-        {
-            state = new State("NY", "New York");
-        }
 
         [Test]
         public void TestSettersInvalidValueTryCatch()
@@ -92,7 +95,7 @@ namespace MMABooksTests
                 state.StateCode = "123";
                 Assert.Fail("If the exception IS NOT thrown, the property IS NOT doing the right thing.");
             }
-            catch (ArgumentOutOfRangeException e)
+            catch (ArgumentOutOfRangeException)
             {
                 Assert.Pass("If the exception IS thrown, the property IS doing the right thing.");
             }

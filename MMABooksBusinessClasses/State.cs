@@ -16,13 +16,29 @@ namespace MMABooksBusinessClasses
             StateName = name;
         }
 
-        // this is an auto implemented property
-        // it effectively creates a private instance variable
-        // and creates "the usual" getter and setter
-        // You can't use it when you're doing validation on a property
-        public string StateName { get; set; }
+
 
         private string stateCode;
+        private string stateName;
+
+        public string StateName {
+            get
+            {
+                return stateName;
+            }
+            set
+            {
+                if (value.Trim().Length > 0 && value.Trim().Length <= 20)
+                {
+                    stateName = value;
+                } 
+                else
+                {
+                    throw new ArgumentOutOfRangeException("State name must be a string between 1-20 characters in length.");
+                }
+            }
+        }
+
         public string StateCode { 
             get
             {
@@ -33,9 +49,13 @@ namespace MMABooksBusinessClasses
                 // this would normally be == 2 but there's some bad data in the database
                 // I didn't realize that until I wrote the test for GetStates in StateDB
                 if (value.Length <= 2)
+                {
                     stateCode = value.ToUpper();
+                }
                 else
+                {
                     throw new ArgumentOutOfRangeException("The state code must be exactly 2 characters.");
+                }
             }
         }
 

@@ -2,26 +2,33 @@
 using System.Collections.Generic;
 using System.Text;
 
-using NUnit.Framework;
 using MMABooksBusinessClasses;
 using MMABooksDBClasses;
+using NUnit.Framework;
 
 namespace MMABooksTests
 {
+    [TestFixture]
     public class CustomerDBTests
     {
+        private Customer c;
+
+        [SetUp]
+        public void Setup()
+        {
+            c = new Customer();
+        }
 
         [Test]
         public void TestGetCustomer()
         {
-            Customer c = CustomerDB.GetCustomer(1);
+            c = CustomerDB.GetCustomer(1);
             Assert.AreEqual(1, c.CustomerID);
         }
 
         [Test]
         public void TestCreateCustomer()
         {
-            Customer c = new Customer();
             c.Name = "Mickey Mouse";
             c.Address = "101 Main Street";
             c.City = "Orlando";
@@ -32,5 +39,14 @@ namespace MMABooksTests
             c = CustomerDB.GetCustomer(customerID);
             Assert.AreEqual("Mickey Mouse", c.Name);
         }
+
+        [Test]
+        public void TestDeleteCustomer() 
+        {
+
+        }
+
+        [Test]
+        public void TestUpdateCustomer() { }
     }
 }

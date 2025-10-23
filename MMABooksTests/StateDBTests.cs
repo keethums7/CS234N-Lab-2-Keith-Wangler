@@ -13,10 +13,13 @@ namespace MMABooksTests
     [TestFixture]
     public class StateDBTests
     {
+        private State state;
+
         [SetUp]
         public void SetUp()
         {
-
+            // testing with Alabama, reset any changes
+            state = new State("AL", "Alabama");
         }
 
         [Test]

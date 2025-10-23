@@ -107,6 +107,58 @@ namespace MMABooksDBClasses
             }
         }
 
+        public static bool AddProduct(Product product)
+        {
+            // get a connection to the database
+            MySqlConnection connection = MMABooksDB.GetConnection();
+            string insertStatement =
+                "INSERT Products " +
+                "(ProductCode, Description, UnitPrice, OnHandQuantity) " +
+                "VALUES (@ProductCode, @Description, @UnitPrice, @OnHandQuantity)";
+
+            // set up the command object
+            MySqlCommand insertCommand =
+                new MySqlCommand(insertStatement, connection);
+            insertCommand.Parameters.AddWithValue(
+                "@ProductCode", product.ProductCode);
+            insertCommand.Parameters.AddWithValue(
+                "@Name", product.Description);
+            insertCommand.Parameters.AddWithValue(
+                "@UnitPrice", product.UnitPrice);
+            insertCommand.Parameters.AddWithValue(
+                "@OnHandQuantity", product.OnHandQuantity);
+
+            try
+            {
+                // open the connection
+                connection.Open();
+                // execute the command
+                insertCommand.ExecuteNonQuery();
+
+                string selectStatement =
+                    "SELECT LAST_INSERT_ID()";
+                MySqlCommand selectCommand =
+                    new MySqlCommand(selectStatement, connection);
+
+                // should return the value of the new row's first column
+                // in this case, ProductCode
+                string addedProductCode = selectCommand.ExecuteScalar().ToString();
+
+                // return a bool
+                return (addedProductCode.Equals(product.ProductCode));                
+            }
+            catch (MySqlException ex)
+            {
+                // throw the exception
+                throw ex;
+            }
+            finally
+            {
+                // close the connection
+                connection.Close();
+            }
+        }
+
         public static bool DeleteProduct(Product product)
         {
             // get a connection to the database
@@ -117,7 +169,7 @@ namespace MMABooksDBClasses
                 "WHERE ProductCode = @ProductCode " +
                 "AND Description = @Description " +
                 "AND UnitPrice = @UnitPrice " +
-                "AND OnHandQuantity = @OnHandQuantity "
+                "AND OnHandQuantity = @OnHandQuantity ";
 
             // set up the command object
             MySqlCommand deleteCommand =
@@ -158,53 +210,45 @@ namespace MMABooksDBClasses
         }
 
         public static bool UpdateProduct(Product oldProduct,
-            Customer newProduct)
+            Product newProduct)
         {
             // create a connection
             MySqlConnection connection = MMABooksDB.GetConnection();
             string updateStatement =
-                "UPDATE Customers SET " +
-                "Name = @NewName, " +
-                "Address = @NewAddress, " +
-                "City = @NewCity, " +
-                "State = @NewState, " +
-                "ZipCode = @NewZipCode " +
-                "WHERE CustomerID = @OldCustomerID " +
-                "AND Name = @OldName " +
-                "AND Address = @OldAddress " +
-                "AND City = @OldCity " +
-                "AND State = @OldState " +
-                "AND ZipCode = @OldZipCode";
+                "UPDATE Products SET " +
+                "ProductCode = @NewProductCode, " +
+                "Description = @NewDescription, " +
+                "UnitPrice = @NewUnitPrice, " +
+                "OnHandQuantity = @NewOnHandQuantity, " +
+                "WHERE ProductCode = @OldProductCode " +
+                "AND Description = @OldDescription " +
+                "AND UnitPrice = @OldUnitPrice " +
+                "AND OnHandQuantity = @OldOnHandQuantity ";
+
             // setup the command object
             MySqlCommand updateCommand =
                 new MySqlCommand(updateStatement, connection);
 
 
-            // Add new customer info to params
+            // Add new product info to params
             updateCommand.Parameters.AddWithValue(
-                "@NewName", newCustomer.Name);
+                "@NewProductCode", newProduct.ProductCode);
             updateCommand.Parameters.AddWithValue(
-                "@NewAddress", newCustomer.Address);
+                "@NewDescription", newProduct.Description);
             updateCommand.Parameters.AddWithValue(
-                "@NewCity", newCustomer.City);
+                "@NewProductCode", newProduct.UnitPrice);
             updateCommand.Parameters.AddWithValue(
-                "@NewState", newCustomer.State);
-            updateCommand.Parameters.AddWithValue(
-                "@NewZipCode", newCustomer.ZipCode);
+                "@NewOnHandQuantity", newProduct.OnHandQuantity);
 
             // Add old customer info to params
             updateCommand.Parameters.AddWithValue(
-                "@OldCustomerID", oldCustomer.CustomerID);
+                "@OldProductCode", oldProduct.ProductCode);
             updateCommand.Parameters.AddWithValue(
-                "@OldName", oldCustomer.Name);
+                "@OldDescription", oldProduct.Description);
             updateCommand.Parameters.AddWithValue(
-                "@OldAddress", oldCustomer.Address);
+                "@OldProductCode", oldProduct.UnitPrice);
             updateCommand.Parameters.AddWithValue(
-                "@OldCity", oldCustomer.City);
-            updateCommand.Parameters.AddWithValue(
-                "@OldState", oldCustomer.State);
-            updateCommand.Parameters.AddWithValue(
-                "@OldZipCode", oldCustomer.ZipCode);
+                "@OldOnHandQuantity", oldProduct.OnHandQuantity);
 
             try
             {

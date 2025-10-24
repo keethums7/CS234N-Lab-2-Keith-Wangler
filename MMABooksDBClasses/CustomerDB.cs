@@ -82,6 +82,7 @@ namespace MMABooksDBClasses
             {
                 connection.Open();
                 insertCommand.ExecuteNonQuery();
+
                 // MySQL specific code for getting last pk value
                 string selectStatement =
                     "SELECT LAST_INSERT_ID()";
@@ -102,8 +103,15 @@ namespace MMABooksDBClasses
 
         public static bool DeleteCustomer(Customer customer)
         {
+            // testing
+            Console.WriteLine($"customer to delete: {customer}");
+
             // get a connection to the database
             MySqlConnection connection = MMABooksDB.GetConnection();
+
+            string preDeleteStatement =
+                "DELETE FROM Invoices " +
+                "WHERE CustomerID = @CustomerID";
 
             string deleteStatement =
                 "DELETE FROM Customers " +
@@ -113,6 +121,14 @@ namespace MMABooksDBClasses
                 "AND City = @City " +
                 "AND State = @State " +
                 "AND ZipCode = @ZipCode";
+
+            // need to remove all rows in invoices table
+            // that link to the customer via customerID
+            // otherwise we'll get a foreign key constraint error
+            MySqlCommand preDeleteCommand =
+                new MySqlCommand(preDeleteStatement, connection);
+            preDeleteCommand.Parameters.AddWithValue(
+                "@CustomerID", customer.CustomerID);
 
             // set up the command object
             MySqlCommand deleteCommand =
@@ -134,6 +150,10 @@ namespace MMABooksDBClasses
             {
                 // open the connection
                 connection.Open();
+
+                // prep work
+                preDeleteCommand.ExecuteNonQuery();
+
                 // execute the command
                 int deletedRows = deleteCommand.ExecuteNonQuery();
                 // if the number of records returned = 1, return true otherwise return false

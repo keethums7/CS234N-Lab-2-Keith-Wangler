@@ -20,6 +20,13 @@ namespace MMABooksTests
         {
             // reset testing instance variables
             product = new Product();
+
+            // update instance variable to match the first row item
+            product.ProductCode = "A4CS";
+            product.Description = "Murach's ASP.NET 4 Web Programming with C# 2010";
+            product.UnitPrice = 56.5000m;
+            product.OnHandQuantity = 4637;
+
             products = new List<Product>();
         }
 
@@ -38,11 +45,42 @@ namespace MMABooksTests
         }
 
         [Test]
+        public void TestAddProduct()
+        {
+            // just changing the product code and price
+            // to differ slightly from row 1's default
+            // so we can confirm it was added
+            product.ProductCode = "NEW1";
+            product.UnitPrice = 13.37m;
+
+            Assert.True(ProductDB.AddProduct(product));
+        }
+            
+        [Test]
+        public void TestUpdateProduct()
+        {
+            // create an empty product that doesn't match any existing rows
+            Product product1 = new Product();
+
+            // Create a test product to update an existing one to
+            Product product2 = new Product();
+            product2.ProductCode = "TEST";
+            product2.Description = "TEST";
+            product2.UnitPrice = 10.00m;
+            product2.OnHandQuantity = 10;
+
+            // UpdateProduct returns a bool, will be true
+            // if the number of updated rows is 1
+            Assert.True(ProductDB.UpdateProduct(product, product2));
+
+            // We expect false here since there should be
+            // no matching product, so # of updated rows is 0
+            Assert.False(ProductDB.UpdateProduct(product1, product2));
+        }
+
+        [Test]
         public void TestDeleteProduct()
         {
-            // update instance variable to match the first row item
-            product = new Product("A4CS", "Murach's ASP.NET 4 Web Programming with C# 2010", 56.5000m, 4637);
-
             // create separate product to test that deletion fails
             // if there's no matching product to delete
             Product product1 = new Product();
@@ -51,30 +89,9 @@ namespace MMABooksTests
             // true if the # of deleted rows is 1
             Assert.True(ProductDB.DeleteProduct(product));
 
-            // We expect an error since there should be
-            // no matching product
-            Assert.Throws<MySqlException>(() => ProductDB.DeleteProduct(product1));
-        }
-
-        [Test]
-        public void TestUpdateProduct()
-        {
-            // update instance variable to match the first row item
-            product = new Product("A4CS", "Murach's ASP.NET 4 Web Programming with C# 2010", 56.5000m, 4637);
-
-            // create an empty product that doesn't match any existing rows
-            Product product1 = new Product();
-
-            // Create a test product to update an existing one to
-            Product product2 = new Product("TEST", "TEST", 10.00m, 10);
-
-            // UpdateProduct returns a bool, will be true
-            // if the number of updated rows is 1
-            Assert.True(ProductDB.UpdateProduct(product, product2));
-
-            // We expect an error since there should be
-            // no matching product
-            Assert.Throws<MySqlException>(() => ProductDB.UpdateProduct(product, product1));
+            // We expect false here since there should be no
+            // matching rows to update, and # of updated rows will be 0
+            Assert.False(ProductDB.DeleteProduct(product1));
         }
     }
 }

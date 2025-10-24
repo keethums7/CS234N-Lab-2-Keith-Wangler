@@ -4,6 +4,7 @@ using System.Text;
 
 using MMABooksBusinessClasses;
 using MMABooksDBClasses;
+using MySql.Data.MySqlClient;
 using NUnit.Framework;
 
 namespace MMABooksTests
@@ -22,6 +23,7 @@ namespace MMABooksTests
         [Test]
         public void TestGetCustomer()
         {
+            //c = new Customer();
             c = CustomerDB.GetCustomer(1);
             Assert.AreEqual(1, c.CustomerID);
         }
@@ -43,7 +45,20 @@ namespace MMABooksTests
         [Test]
         public void TestDeleteCustomer() 
         {
+            Customer customer = new Customer();
+            customer = CustomerDB.GetCustomer(1);
+            Console.WriteLine(customer);
 
+            // Test that it won't delete
+            // an invalid (empty) customer object
+            Assert.False(CustomerDB.DeleteCustomer(c));
+
+            // Test that a known existing
+            // customer can be deleted
+            Assert.True(CustomerDB.DeleteCustomer(customer));
+
+            // Readd and update the customer to reset the change
+            CustomerDB.AddCustomer(customer);
         }
 
         [Test]

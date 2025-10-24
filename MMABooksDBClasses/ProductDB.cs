@@ -20,7 +20,7 @@ namespace MMABooksDBClasses
 
             // build our query string and use it to build command object
             string selectListStatement =
-                "SELECT * from Customers";
+                "SELECT * from Products";
             MySqlCommand selectListCommand = new MySqlCommand(selectListStatement, connection);
 
             try
@@ -122,7 +122,7 @@ namespace MMABooksDBClasses
             insertCommand.Parameters.AddWithValue(
                 "@ProductCode", product.ProductCode);
             insertCommand.Parameters.AddWithValue(
-                "@Name", product.Description);
+                "@Description", product.Description);
             insertCommand.Parameters.AddWithValue(
                 "@UnitPrice", product.UnitPrice);
             insertCommand.Parameters.AddWithValue(
@@ -135,17 +135,11 @@ namespace MMABooksDBClasses
                 // execute the command
                 insertCommand.ExecuteNonQuery();
 
-                string selectStatement =
-                    "SELECT LAST_INSERT_ID()";
-                MySqlCommand selectCommand =
-                    new MySqlCommand(selectStatement, connection);
-
-                // should return the value of the new row's first column
-                // in this case, ProductCode
-                string addedProductCode = selectCommand.ExecuteScalar().ToString();
-
-                // return a bool
-                return (addedProductCode.Equals(product.ProductCode));                
+                Product addedProduct = GetProduct(product.ProductCode);
+                if (addedProduct.ProductCode.Equals(product.ProductCode))
+                {
+                    return true;
+                }
             }
             catch (MySqlException ex)
             {
@@ -157,12 +151,20 @@ namespace MMABooksDBClasses
                 // close the connection
                 connection.Close();
             }
+            return false;
         }
 
         public static bool DeleteProduct(Product product)
         {
             // get a connection to the database
             MySqlConnection connection = MMABooksDB.GetConnection();
+
+            // we need to clear the invoicelineitems table
+            // of any rows that link the ProductCode, otherwise
+            // we'll encounter a foreign key constraint error
+            string preDeleteStatement =
+                "DELETE FROM InvoiceLineItems " +
+                "WHERE ProductCode = @ProductCode";
 
             string deleteStatement =
                 "DELETE FROM Products " +
@@ -171,13 +173,20 @@ namespace MMABooksDBClasses
                 "AND UnitPrice = @UnitPrice " +
                 "AND OnHandQuantity = @OnHandQuantity ";
 
+
+            // prep work
+            MySqlCommand preDeleteCommand = 
+                new MySqlCommand(preDeleteStatement, connection);
+            preDeleteCommand.Parameters.AddWithValue(
+                "@ProductCode", product.ProductCode);
+
             // set up the command object
             MySqlCommand deleteCommand =
                 new MySqlCommand(deleteStatement, connection);
             deleteCommand.Parameters.AddWithValue(
                 "@ProductCode", product.ProductCode);
             deleteCommand.Parameters.AddWithValue(
-                "@Name", product.Description);
+                "@Description", product.Description);
             deleteCommand.Parameters.AddWithValue(
                 "@UnitPrice", product.UnitPrice);
             deleteCommand.Parameters.AddWithValue(
@@ -187,6 +196,9 @@ namespace MMABooksDBClasses
             {
                 // open the connection
                 connection.Open();
+                // execute the pre-command
+                int preDeletedRows = preDeleteCommand.ExecuteNonQuery();
+
                 // execute the command
                 int deletedRows = deleteCommand.ExecuteNonQuery();
                 // if the number of records returned = 1, return true otherwise return false
@@ -216,14 +228,13 @@ namespace MMABooksDBClasses
             MySqlConnection connection = MMABooksDB.GetConnection();
             string updateStatement =
                 "UPDATE Products SET " +
-                "ProductCode = @NewProductCode, " +
                 "Description = @NewDescription, " +
                 "UnitPrice = @NewUnitPrice, " +
-                "OnHandQuantity = @NewOnHandQuantity, " +
+                "OnHandQuantity = @NewOnHandQuantity " +
                 "WHERE ProductCode = @OldProductCode " +
                 "AND Description = @OldDescription " +
                 "AND UnitPrice = @OldUnitPrice " +
-                "AND OnHandQuantity = @OldOnHandQuantity ";
+                "AND OnHandQuantity = @OldOnHandQuantity";
 
             // setup the command object
             MySqlCommand updateCommand =
@@ -236,7 +247,7 @@ namespace MMABooksDBClasses
             updateCommand.Parameters.AddWithValue(
                 "@NewDescription", newProduct.Description);
             updateCommand.Parameters.AddWithValue(
-                "@NewProductCode", newProduct.UnitPrice);
+                "@NewUnitPrice", newProduct.UnitPrice);
             updateCommand.Parameters.AddWithValue(
                 "@NewOnHandQuantity", newProduct.OnHandQuantity);
 
@@ -246,7 +257,7 @@ namespace MMABooksDBClasses
             updateCommand.Parameters.AddWithValue(
                 "@OldDescription", oldProduct.Description);
             updateCommand.Parameters.AddWithValue(
-                "@OldProductCode", oldProduct.UnitPrice);
+                "@OldUnitPrice", oldProduct.UnitPrice);
             updateCommand.Parameters.AddWithValue(
                 "@OldOnHandQuantity", oldProduct.OnHandQuantity);
 
